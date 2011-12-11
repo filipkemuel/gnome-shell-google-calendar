@@ -172,17 +172,23 @@ class CalendarServer(dbus.service.Object):
         self.scheduler.daemon = True
         self.scheduler.start()
 
+    def needs_update(self):
+        current_month_key = get_month_key(datetime.now())
+        if not current_month_key in self.months:
+            return True
+        if self.months[current_month_key].needs_update(timedelta(minutes=2)):
+            return True
+        return False
+
     def scheduler(self, timeout):
         while 1:
             sleep(timeout.seconds)
             print 'Checking if actual month events need update...'
-            if self.months[get_month_key(datetime.now())].\
-                    needs_update(timedelta(minutes=2)):
+            if self.needs_update():
                 while self.updater.is_alive():
                     sleep(1)
                     print 'Scheduler waiting for updater thread to end...'
-                if self.months[get_month_key(datetime.now())].\
-                        needs_update(timedelta(minutes=2)):
+                if self.needs_update():
                     print 'Scheduler starts updater thread...'
                     self.updater = Thread(target=self.update_months_events,
                                         args=(datetime.now(), True))
