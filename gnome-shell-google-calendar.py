@@ -278,23 +278,21 @@ class CalendarServer(dbus.service.Object):
         """Check if months around month declared by `key` need update or not
         yet fetched"""
 
-        # Check if this month needs update
-        if self.months[key].needs_update():
-            return True
+        #  get a list of months to check
+        months_to_check = [key]
+        for i in range(months_back):
+            months_to_check.append(
+                    self.months[months_to_check[-1]].get_prev_month_key())
+        months_to_check.reverse()
+        for i in range(months_ahead):
+            months_to_check.append(
+                    self.months[months_to_check[-1]].get_next_month_key())
 
-        #  walk forward and backward a number of months looking for a
-        #  month that needs updating
-        for months_to_retrieve, get_month_key in (
-                ( months_back, lambda x: self.months[x].get_prev_month_key() ),
-                ( months_ahead, lambda x: self.months[x].get_next_month_key() ),
-                ):
-            month_key = key
-            for i in range(0, months_to_retrieve):
-                month_key = get_month_key(month_key)
-                print '*******************', month_key
-                month = self.months.get(month_key, None)
-                if not month or (month and month.needs_update()):
-                    return True
+        #  Do any of those months need updating
+        for month_key in months_to_check:
+            month = self.months.get(month_key)
+            if not month or (month and month.needs_update()):
+                return True
 
         # All up to date
         return False
