@@ -240,7 +240,6 @@ class CalendarServer(dbus.service.Object):
             query.max_results = 2**31-1
             feed = self.client.CalendarQuery(query)
 
-            if debug: print 'Getting events...'
             for event in feed.entry:
                 event_id = event.id.text
                 title = event.title.text
