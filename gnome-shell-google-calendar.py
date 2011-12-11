@@ -240,14 +240,18 @@ class CalendarServer(dbus.service.Object):
             query.max_results = 2**31-1
             feed = self.client.CalendarQuery(query)
 
+            if debug: print 'Getting events...'
             for event in feed.entry:
                 event_id = event.id.text
                 title = event.title.text
 
-                if debug: print prefix, '  ', title
+                if debug:
+                    print '%s Event: title=%s' % ( prefix, repr(title) )
 
                 for when in event.when:
-                    if debug: print prefix, '    ', when.start_time, 'to', when.end_time
+                    if debug:
+                        print '%s    start_time=%s end_time=%s' % ( prefix,
+                                repr(when.start_time), repr(when.end_time) )
 
                     allday = False
                     start, allday = self.parse_time(when.start_time)
