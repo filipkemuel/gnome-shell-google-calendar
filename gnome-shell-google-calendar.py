@@ -14,6 +14,9 @@ import iso8601
 import keyring
 
 
+#  change to "True" to get debugging messages
+debug = False
+
 def get_month_key(date, first_day_of_week=7):
     """Returns range of dates displayed on calendars for `date`'s month.
     Parameters:
@@ -174,7 +177,7 @@ class CalendarServer(dbus.service.Object):
 
             if not url in urls:
                 print '  ', title
-#                print '    ', url
+                if debug: print '    ', url
                 urls.add(url)
                 calendars.append((title, url))
 
@@ -241,10 +244,10 @@ class CalendarServer(dbus.service.Object):
                 event_id = event.id.text
                 title = event.title.text
 
-#                print prefix, '  ', title
+                if debug: print prefix, '  ', title
 
                 for when in event.when:
-#                    print prefix, '    ', when.start_time, 'to', when.end_time
+                    if debug: print prefix, '    ', when.start_time, 'to', when.end_time
 
                     allday = False
                     start, allday = self.parse_time(when.start_time)
