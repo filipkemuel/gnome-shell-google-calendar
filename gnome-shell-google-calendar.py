@@ -101,7 +101,9 @@ class MonthEvents(object):
 
         #  pass back event information
         for events in events_by_key.values():
-            gnome_event = events[0].as_gnome_event()
+            gnome_event = list(events[0].as_gnome_event())
+            gnome_event[1] += ' (%s)' % (
+                    '/'.join([x.get_short_calendar_title() for x in events]), )
             yield gnome_event
 
     def __repr__(self):
@@ -111,12 +113,20 @@ class MonthEvents(object):
 
 
 class Event(object):
-    def __init__(self, event_id, title, start_time, end_time, allday=False):
+    def __init__(self, event_id, title, start_time, end_time, allday=False,
+            calendar_title=''):
         self.event_id = event_id
         self.title = title
         self.start_time = start_time
         self.end_time = end_time
         self.allday = allday
+        self.calendar_title = calendar_title
+
+    def get_short_calendar_title(self):
+        if len(self.calendar_title.split()) > 1:
+            return ''.join([x[0] for x in self.calendar_title.split()])
+
+        return self.calendar_title[:2]
 
     def get_key(self):
         return self.title, self.allday, self.start_time
@@ -249,8 +259,8 @@ class CalendarServer(dbus.service.Object):
         max_date = months[key].get_end_date()
 
         # Get events from all calendars
-        for calendar, feed_url in self.calendars:
-            print prefix, 'Getting events from', calendar, '...'
+        for calendar_title, feed_url in self.calendars:
+            print prefix, 'Getting events from', calendar_title, '...'
 
             query = CalendarEventQuery()
             query.feed = feed_url
@@ -275,7 +285,8 @@ class CalendarServer(dbus.service.Object):
                     start, allday = self.parse_time(when.start_time)
                     end = self.parse_time(when.end_time)[0]
 
-                    e = Event(event_id, title, start, end, allday)
+                    e = Event(event_id, title, start, end, allday,
+                            calendar_title)
                     for month in months.values():
                         month.add_event(e)
 
