@@ -61,13 +61,7 @@ class MonthEvents(object):
         end = self.end
         if (event.start_time >= start and event.start_time < end) or\
                 (event.start_time <= start and event.end_time - 1 > start):
-            self.gnome_events.append(('',                       # uid
-                           event.title if event.title else '',  # summary
-                           '',                                  # description
-                           event.allday,                        # allDay
-                           event.start_time,                    # date
-                           event.end_time,                      # end
-                           {}))                                 # extras
+            self.gnome_events.append(event.as_gnome_event())
 
     def updated(self):
         self.last_update = datetime.now()
@@ -105,6 +99,15 @@ class Event(object):
         self.start_time = start_time
         self.end_time = end_time
         self.allday = allday
+
+    def as_gnome_event(self):
+        return ('',                                 # uid
+                self.title if self.title else '',   # summary
+                '',                                 # description
+                self.allday,                        # allDay
+                self.start_time,                    # date
+                self.end_time,                      # end
+                {})                                 # extras
 
     def __repr__(self):
         return '<Event: %r>' % (self.title)
