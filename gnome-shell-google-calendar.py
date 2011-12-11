@@ -16,6 +16,7 @@ import keyring
 
 #  change to "True" to get debugging messages
 debug = False
+debug = True
 
 def get_month_key(date, first_day_of_week=7):
     """Returns range of dates displayed on calendars for `date`'s month.
@@ -257,7 +258,7 @@ class CalendarServer(dbus.service.Object):
                     end, _ = self.parse_time(when.end_time)
 
                     e = Event(event_id, title, start, end, allday)
-                    for _, month in months.items():
+                    for month in months.values():
                         month.add_event(e)
 
         # Replace old months events by new ones
