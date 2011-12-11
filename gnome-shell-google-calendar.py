@@ -18,6 +18,27 @@ import calendar
 #  change to "True" to get debugging messages
 debug = False
 
+def write_traceback(f):
+    '''Wrapper that catches any tracebacks that are found and writes them to
+    stdout.  This is because Gnome isn't so good about telling you.'''
+
+    def wrapper(*args, **kwargs):
+        try:
+            if debug:
+                print dir(f)
+                print 'Calling: %s with args=%s kwargs=%s' % ( f, args, kwargs )
+            ret = f(*args, **kwargs)
+            if debug:
+                print 'Returning from %s: %s' % ( f, ret )
+            return ret
+        except Exception, e:
+            import traceback
+            print '*** Exception:', e
+            traceback.print_exc()
+            raise
+    return wrapper
+
+
 def get_month_key(date, first_day_of_week=7):
     """Returns range of dates displayed on calendars for `date`'s month.
     Parameters:
@@ -86,6 +107,7 @@ class MonthEvents(object):
     def get_end_date(self):
         return datetime.fromtimestamp(self.end)
 
+    @write_traceback
     def get_gnome_events(self):
         '''Return a list of events to display on the calendar.  This function
         removes duplicate events.'''
@@ -99,12 +121,15 @@ class MonthEvents(object):
             events_by_key[event_key] = event_list
             event_list.append(event)
 
-        #  pass back event information
+        #  collect events
+        ret = []
         for events in events_by_key.values():
             gnome_event = list(events[0].as_gnome_event())
             gnome_event[1] += ' (%s)' % (
                     '/'.join([x.get_short_calendar_title() for x in events]), )
-            yield gnome_event
+            ret.append(gnome_event)
+
+        return ret
 
     def __repr__(self):
         return u'<MonthEvents: %s, with %d events>' % (
@@ -122,6 +147,7 @@ class Event(object):
         self.allday = allday
         self.calendar_title = calendar_title
 
+    @write_traceback
     def get_short_calendar_title(self):
         if len(self.calendar_title.split()) > 1:
             return ''.join([x[0] for x in self.calendar_title.split()])
@@ -131,6 +157,7 @@ class Event(object):
     def get_key(self):
         return self.title, self.allday, self.start_time
 
+    @write_traceback
     def as_gnome_event(self):
         return ('',                                 # uid
                 self.title if self.title else '',   # summary
@@ -232,6 +259,7 @@ class CalendarServer(dbus.service.Object):
 
         return (timestamp, allday)
 
+    @write_traceback
     def update_months_events(self, probe_date, in_thread=False,
                             months_back=12, months_ahead=12):
         if in_thread:
@@ -310,6 +338,7 @@ class CalendarServer(dbus.service.Object):
                 (min_date + timedelta(days=10)).strftime('%B %Y'), \
                 'until', (max_date - timedelta(days=10)).strftime('%B %Y')
 
+    @write_traceback
     def need_update_near(self, key, months_back=6, months_ahead=6):
         """Check if months around month declared by `key` need update or not
         yet fetched"""
