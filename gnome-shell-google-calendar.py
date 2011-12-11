@@ -255,7 +255,7 @@ class CalendarServer(dbus.service.Object):
 
                     allday = False
                     start, allday = self.parse_time(when.start_time)
-                    end, _ = self.parse_time(when.end_time)
+                    end = self.parse_time(when.end_time)[0]
 
                     e = Event(event_id, title, start, end, allday)
                     for month in months.values():
