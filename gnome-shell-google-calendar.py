@@ -12,6 +12,7 @@ import dbus.service
 import gtk
 import iso8601
 import keyring
+import calendar
 
 
 #  change to "True" to get debugging messages
@@ -24,22 +25,16 @@ def get_month_key(date, first_day_of_week=7):
      - `first_day_of_week`: integer representing first day of week used by
                             calendar; Monday -> 1, ..., Sunday -> 7
     """
-    start_date = date.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-    while start_date.isocalendar()[2] != first_day_of_week:
-        start_date -= timedelta(days=1)
+    month_calendar = list(calendar.Calendar(first_day_of_week - 1
+            ).itermonthdates(date.year, date.month))
 
-    end_date = date.replace(day=28, hour=23, minute=59, second=59,
-            microsecond=999999)
-    initial_month = end_date.month
-    while end_date.month == initial_month:
-        end_date += timedelta(days=1)
-    end_date -= timedelta(days=1)
-    last_day_of_week = first_day_of_week - 1 or 7
-    while end_date.isocalendar()[2] != last_day_of_week:
-        end_date += timedelta(days=1)
+    start_date = datetime(month_calendar[0].year, month_calendar[0].month,
+            month_calendar[0].day)
+    end_date = datetime(month_calendar[-1].year, month_calendar[-1].month,
+            month_calendar[-1].day, hour = 23, minute = 59, second = 59)
 
-    return int(mktime(start_date.timetuple())),\
-            int(mktime(end_date.timetuple()))
+    return ( int(mktime(start_date.timetuple())),
+            int(mktime(end_date.timetuple())) )
 
 
 class MonthEvents(object):
