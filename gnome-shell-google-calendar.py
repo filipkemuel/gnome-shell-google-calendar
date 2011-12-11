@@ -16,7 +16,6 @@ import keyring
 
 #  change to "True" to get debugging messages
 debug = False
-debug = True
 
 def get_month_key(date, first_day_of_week=7):
     """Returns range of dates displayed on calendars for `date`'s month.
@@ -275,35 +274,27 @@ class CalendarServer(dbus.service.Object):
                 (min_date + timedelta(days=10)).strftime('%B %Y'), \
                 'until', (max_date - timedelta(days=10)).strftime('%B %Y')
 
-    def need_update_near(self, _key, months_back=6, months_ahead=6):
+    def need_update_near(self, key, months_back=6, months_ahead=6):
         """Check if months around month declared by `key` need update or not
         yet fetched"""
-        key = _key
 
         # Check if this month needs update
         if self.months[key].needs_update():
             return True
 
-        # Check if previous months need update of not fetched
-        for i in range(0, months_back):
-            key = self.months[key].get_prev_month_key()
-            month = self.months.get(key, None)
-            if month:
-                if self.months[key].needs_update():
+        #  walk forward and backward a number of months looking for a
+        #  month that needs updating
+        for months_to_retrieve, get_month_key in (
+                ( months_back, lambda x: self.months[x].get_prev_month_key() ),
+                ( months_ahead, lambda x: self.months[x].get_next_month_key() ),
+                ):
+            month_key = key
+            for i in range(0, months_to_retrieve):
+                month_key = get_month_key(month_key)
+                print '*******************', month_key
+                month = self.months.get(month_key, None)
+                if not month or (month and month.needs_update()):
                     return True
-            else:
-                return True
-
-        # Check if next months need update of not fetched
-        key = _key
-        for i in range(0, months_ahead):
-            key = self.months[key].get_next_month_key()
-            month = self.months.get(key, None)
-            if month:
-                if self.months[key].needs_update():
-                    return True
-            else:
-                return True
 
         # All up to date
         return False
