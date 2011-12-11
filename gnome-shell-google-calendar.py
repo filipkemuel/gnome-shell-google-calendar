@@ -44,7 +44,7 @@ class MonthEvents(object):
     def __init__(self, key, events):
         self.start = key[0]
         self.end = key[1]
-        self.gnome_events = []
+        self.events = []
         for event in events:
             self.add_event(event)
         self.last_update = datetime.now()
@@ -52,7 +52,7 @@ class MonthEvents(object):
     def delete(self):
         del self.start
         del self.end
-        del self.gnome_events[:]
+        del self.events[:]
         del self.last_update
 
     def add_event(self, event):
@@ -61,7 +61,7 @@ class MonthEvents(object):
         end = self.end
         if (event.start_time >= start and event.start_time < end) or\
                 (event.start_time <= start and event.end_time - 1 > start):
-            self.gnome_events.append(event.as_gnome_event())
+            self.events.append(event)
 
     def updated(self):
         self.last_update = datetime.now()
@@ -86,10 +86,28 @@ class MonthEvents(object):
     def get_end_date(self):
         return datetime.fromtimestamp(self.end)
 
+    def get_gnome_events(self):
+        '''Return a list of events to display on the calendar.  This function
+        removes duplicate events.'''
+
+        #  join events that have the same key
+        events_by_key = {}
+        for event in self.events:
+            event_key = event.get_key()
+
+            event_list = events_by_key.get(event_key) or []
+            events_by_key[event_key] = event_list
+            event_list.append(event)
+
+        #  pass back event information
+        for events in events_by_key.values():
+            gnome_event = events[0].as_gnome_event()
+            yield gnome_event
+
     def __repr__(self):
         return u'<MonthEvents: %s, with %d events>' % (
                 (self.get_start_date() + timedelta(days=10)).strftime('%B %Y'),
-                len(self.gnome_events))
+                len(self.events))
 
 
 class Event(object):
@@ -99,6 +117,9 @@ class Event(object):
         self.start_time = start_time
         self.end_time = end_time
         self.allday = allday
+
+    def get_key(self):
+        return self.title, self.allday, self.start_time
 
     def as_gnome_event(self):
         return ('',                                 # uid
@@ -329,9 +350,9 @@ class CalendarServer(dbus.service.Object):
         else:
             print '  Data loaded form cache'
 
-        print ' #Returning', len(self.months[key].gnome_events), 'events...'
+        print ' #Returning', len(self.months[key].events), 'events...'
 
-        return self.months[key].gnome_events
+        return self.months[key].get_gnome_events()
 
 
 def login(email, password):
