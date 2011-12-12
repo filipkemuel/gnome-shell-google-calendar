@@ -150,9 +150,9 @@ class Event(object):
     @write_traceback
     def get_short_calendar_title(self):
         if len(self.calendar_title.split()) > 1:
-            return ''.join([x[0] for x in self.calendar_title.split()])
+            return ''.join([x[0] for x in unicode(self.calendar_title).split()])
 
-        return self.calendar_title[:2]
+        return unicode(self.calendar_title)[:2]
 
     def get_key(self):
         return self.title, self.allday, self.start_time
