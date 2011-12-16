@@ -13,6 +13,7 @@ import gtk
 import iso8601
 import keyring
 import calendar
+import os
 
 
 #  change to "True" to get debugging messages
@@ -56,7 +57,6 @@ def get_month_key(date, first_day_of_week=7):
 
     return ( int(mktime(start_date.timetuple())),
             int(mktime(end_date.timetuple())) )
-
 
 class MonthEvents(object):
     """
@@ -225,8 +225,19 @@ class CalendarServer(dbus.service.Object):
             else:
                 print 'No need for update'
 
+    def get_excludes(self, filename):
+        '''Gets a list of calendars to exclude'''
+        excludes = []
+        if os.access(filename, os.F_OK):
+            for line in open(filename, 'r'):
+               excludes.append(line.strip())
+        return excludes
+        
     def get_calendars(self):
         feed = self.client.GetAllCalendarsFeed()
+
+        # Load excluded calendars from excludes file
+        excludes = self.get_excludes('%s/excludes' % os.getcwd())
 
         calendars = []
         urls = set()
@@ -236,6 +247,8 @@ class CalendarServer(dbus.service.Object):
         for calendar in feed.entry:
             title = calendar.title.text
             url = calendar.content.src
+
+            if title in excludes: continue
 
             if not url in urls:
                 print '  ', title
