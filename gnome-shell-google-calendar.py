@@ -58,6 +58,7 @@ def get_month_key(date, first_day_of_week=7):
     return ( int(mktime(start_date.timetuple())),
             int(mktime(end_date.timetuple())) )
 
+
 class MonthEvents(object):
     """
     Caches events of month
@@ -227,17 +228,18 @@ class CalendarServer(dbus.service.Object):
 
     def get_excludes(self, filename):
         '''Gets a list of calendars to exclude'''
-        excludes = []
-        if os.access(filename, os.F_OK):
-            for line in open(filename, 'r'):
-               excludes.append(line.strip())
-        return excludes
-        
+        with open(filename, 'r') as fp:
+            return [ line.strip() for line in fp ]
+
     def get_calendars(self):
         feed = self.client.GetAllCalendarsFeed()
 
         # Load excluded calendars from excludes file
-        excludes = self.get_excludes('%s/excludes' % os.getcwd())
+        excludes = []
+        for filename in ('excludes',
+                os.path.expanduser('~/.gnome-shell-google-calendar-excludes')):
+            if os.path.exists(filename):
+                excludes += self.get_excludes(filename)
 
         calendars = []
         urls = set()
