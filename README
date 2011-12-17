@@ -29,6 +29,9 @@
       
       Once logged in, events from all your calendars should appear in
       GNOME Shell's calendar.
+
+      To exclude calendars, create a file named "excludes" and put one calendar
+      title per line.
     
     ~ Future
       
