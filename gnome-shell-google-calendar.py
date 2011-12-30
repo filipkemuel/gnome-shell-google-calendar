@@ -1,5 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+import sys
+import getopt
 from datetime import datetime, timedelta
 from getpass import getpass
 from threading import Thread
@@ -17,6 +19,8 @@ import calendar
 
 #  change to "True" to get debugging messages
 debug = False
+
+SHOW_SHORT_CALENDAR_TITLE = True
 
 def write_traceback(f):
     '''Wrapper that catches any tracebacks that are found and writes them to
@@ -125,8 +129,10 @@ class MonthEvents(object):
         ret = []
         for events in events_by_key.values():
             gnome_event = list(events[0].as_gnome_event())
-            gnome_event[1] += ' (%s)' % (
-                    '/'.join([x.get_short_calendar_title() for x in events]), )
+            if SHOW_SHORT_CALENDAR_TITLE:
+                gnome_event[1] += ' (%s)' % (
+                        '/'.join([x.get_short_calendar_title()
+                                for x in events]), )
             ret.append(gnome_event)
 
         return ret
@@ -422,6 +428,11 @@ def login_prompt():
 
 if __name__ == '__main__':
     dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
+
+    opts, args = getopt.getopt(sys.argv[1:], '', ['hide-cal'])
+    for o, a in opts:
+        if o == '--hide-cal':
+            SHOW_SHORT_CALENDAR_TITLE = False
 
     # Get credentials
     try:
