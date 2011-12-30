@@ -20,7 +20,9 @@ import calendar
 #  change to "True" to get debugging messages
 debug = False
 
+
 SHOW_SHORT_CALENDAR_TITLE = True
+
 
 def write_traceback(f):
     '''Wrapper that catches any tracebacks that are found and writes them to
@@ -30,10 +32,10 @@ def write_traceback(f):
         try:
             if debug:
                 print dir(f)
-                print 'Calling: %s with args=%s kwargs=%s' % ( f, args, kwargs )
+                print 'Calling: %s with args=%s kwargs=%s' % (f, args, kwargs)
             ret = f(*args, **kwargs)
             if debug:
-                print 'Returning from %s: %s' % ( f, ret )
+                print 'Returning from %s: %s' % (f, ret)
             return ret
         except Exception, e:
             import traceback
@@ -56,10 +58,10 @@ def get_month_key(date, first_day_of_week=7):
     start_date = datetime(month_calendar[0].year, month_calendar[0].month,
             month_calendar[0].day)
     end_date = datetime(month_calendar[-1].year, month_calendar[-1].month,
-            month_calendar[-1].day, hour = 23, minute = 59, second = 59)
+            month_calendar[-1].day, hour=23, minute=59, second=59)
 
-    return ( int(mktime(start_date.timetuple())),
-            int(mktime(end_date.timetuple())) )
+    return (int(mktime(start_date.timetuple())),
+            int(mktime(end_date.timetuple())))
 
 
 class MonthEvents(object):
@@ -156,7 +158,8 @@ class Event(object):
     @write_traceback
     def get_short_calendar_title(self):
         if len(self.calendar_title.split()) > 1:
-            return ''.join([x[0] for x in unicode(self.calendar_title).split()])
+            return ''.join([x[0] for x in
+                    unicode(self.calendar_title).split()])
 
         return unicode(self.calendar_title)[:2]
 
@@ -175,6 +178,7 @@ class Event(object):
 
     def __repr__(self):
         return '<Event: %r>' % (self.title)
+
 
 class CalendarServer(dbus.service.Object):
     busname = 'org.gnome.Shell.CalendarServer'
@@ -245,7 +249,8 @@ class CalendarServer(dbus.service.Object):
 
             if not url in urls:
                 print '  ', title
-                if debug: print '    ', url
+                if debug:
+                    print '    ', url
                 urls.add(url)
                 calendars.append((title, url))
 
@@ -258,7 +263,7 @@ class CalendarServer(dbus.service.Object):
             allday = True
         except ValueError:
             time = iso8601.parse_date(timestr)
-            time = time.timetuple()[:-1] + (-1,) # Discard tm_isdst
+            time = time.timetuple()[:-1] + (-1,)  # Discard tm_isdst
             allday = False
 
         timestamp = int(mktime(time))
@@ -306,7 +311,7 @@ class CalendarServer(dbus.service.Object):
             query.feed = feed_url
             query.start_min = min_date.strftime('%Y-%m-%d')
             query.start_max = max_date.strftime('%Y-%m-%d')
-            query.max_results = 2**31-1
+            query.max_results = 2 ** 31 - 1
             feed = self.client.CalendarQuery(query)
 
             for event in feed.entry:
@@ -314,12 +319,12 @@ class CalendarServer(dbus.service.Object):
                 title = event.title.text
 
                 if debug:
-                    print '%s Event: title=%s' % ( prefix, repr(title) )
+                    print '%s Event: title=%s' % (prefix, repr(title))
 
                 for when in event.when:
                     if debug:
-                        print '%s    start_time=%s end_time=%s' % ( prefix,
-                                repr(when.start_time), repr(when.end_time) )
+                        print '%s    start_time=%s end_time=%s' % (prefix,
+                                repr(when.start_time), repr(when.end_time))
 
                     allday = False
                     start, allday = self.parse_time(when.start_time)
