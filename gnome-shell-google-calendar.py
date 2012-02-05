@@ -15,6 +15,7 @@ import gtk
 import iso8601
 import keyring
 import calendar
+import os
 
 
 #  change to "True" to get debugging messages
@@ -235,8 +236,20 @@ class CalendarServer(dbus.service.Object):
             else:
                 print 'No need for update'
 
+    def get_excludes(self, filename):
+        '''Gets a list of calendars to exclude'''
+        with open(filename, 'r') as fp:
+            return [ line.strip() for line in fp ]
+
     def get_calendars(self):
         feed = self.client.GetAllCalendarsFeed()
+
+        # Load excluded calendars from excludes file
+        excludes = []
+        for filename in ('excludes',
+                os.path.expanduser('~/.gnome-shell-google-calendar-excludes')):
+            if os.path.exists(filename):
+                excludes += self.get_excludes(filename)
 
         calendars = []
         urls = set()
@@ -246,6 +259,8 @@ class CalendarServer(dbus.service.Object):
         for calendar in feed.entry:
             title = calendar.title.text
             url = calendar.content.src
+
+            if title in excludes: continue
 
             if not url in urls:
                 print '  ', title
