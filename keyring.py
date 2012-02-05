@@ -24,6 +24,10 @@ def get_item_id():
         results = gk.find_items_sync(gk.ITEM_GENERIC_SECRET, _attrs)
         _item_id = results[0].item_id
     except gk.NoMatchError:
+        # Check if ''_keyring'' has been created.
+        if _keyring not in gk.list_keyring_names_sync():
+            # if it is missing then create a new keyring called ''_keyring''
+            gk.create_sync(_keyring, _keyring)
         # Create item
         _item_id = gk.item_create_sync(_keyring, _type,
                                        _display_name, _attrs, '', True)
