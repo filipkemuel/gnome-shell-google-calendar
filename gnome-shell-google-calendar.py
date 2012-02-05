@@ -239,7 +239,7 @@ class CalendarServer(dbus.service.Object):
     def get_excludes(self, filename):
         '''Gets a list of calendars to exclude'''
         with open(filename, 'r') as fp:
-            return [ line.strip() for line in fp ]
+            return [line.strip() for line in fp]
 
     def get_calendars(self):
         feed = self.client.GetAllCalendarsFeed()
@@ -260,7 +260,8 @@ class CalendarServer(dbus.service.Object):
             title = calendar.title.text
             url = calendar.content.src
 
-            if title in excludes: continue
+            if title in excludes:
+                continue
 
             if not url in urls:
                 print '  ', title
