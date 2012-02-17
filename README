@@ -24,8 +24,8 @@
       
         ./gnome-shell-google-calendar.py
       
-      You will be prompted for your Google Calendar email and password the
-      first time, which will be stored safely in your keyring.
+      You will be prompted for your Google Calendar email the
+      first time. A password is not neccesary, as gnome-online-accounts is used.
       
       Once logged in, events from all your calendars should appear in
       GNOME Shell's calendar.

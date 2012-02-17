@@ -7,17 +7,18 @@ from getpass import getpass
 from threading import Thread
 from time import mktime, sleep
 
-from gdata.calendar.service import CalendarService, CalendarEventQuery
+import gdata.calendar.client
+
 import dbus
 import dbus.mainloop.glib
 import dbus.service
 import gtk
 import iso8601
-import keyring
 import calendar
 import os
 
-
+import oauth
+import config
 #  change to "True" to get debugging messages
 debug = False
 
@@ -135,7 +136,7 @@ class MonthEvents(object):
             if SHOW_SHORT_CALENDAR_TITLE:
                 gnome_event[1] += ' (%s)' % (
                         '/'.join([x.get_short_calendar_title()
-                                for x in events]), )
+                                for x in events]),)
             ret.append(gnome_event)
 
         return ret
@@ -169,12 +170,12 @@ class Event(object):
 
     @write_traceback
     def as_gnome_event(self):
-        return ('',                                 # uid
-                self.title if self.title else '',   # summary
-                '',                                 # description
-                self.allday,                        # allDay
-                self.start_time,                    # date
-                self.end_time,                      # end
+        return ('', # uid
+                self.title if self.title else '', # summary
+                '', # description
+                self.allday, # allDay
+                self.start_time, # date
+                self.end_time, # end
                 {})                                 # extras
 
     def __repr__(self):
@@ -294,8 +295,8 @@ class CalendarServer(dbus.service.Object):
         else:
             prefix = '    '
 
-        print prefix, 'Update months events around:',\
-                probe_date.strftime('%B %Y'), '| months_back', months_back,\
+        print prefix, 'Update months events around:', \
+                probe_date.strftime('%B %Y'), '| months_back', months_back, \
                 '| months_ahead', months_ahead
 
         months = {}
@@ -323,12 +324,12 @@ class CalendarServer(dbus.service.Object):
         for calendar_title, feed_url in self.calendars:
             print prefix, 'Getting events from', calendar_title, '...'
 
-            query = CalendarEventQuery()
+            query = gdata.calendar.client.CalendarEventQuery()
             query.feed = feed_url
             query.start_min = min_date.strftime('%Y-%m-%d')
             query.start_max = max_date.strftime('%Y-%m-%d')
             query.max_results = 2 ** 31 - 1
-            feed = self.client.CalendarQuery(query)
+            feed = self.client.GetCalendarEventFeed(feed_url, q=query)
 
             for event in feed.entry:
                 event_id = event.id.text
@@ -338,13 +339,14 @@ class CalendarServer(dbus.service.Object):
                     print '%s Event: title=%s' % (prefix, repr(title))
 
                 for when in event.when:
+                    #print dir(when)
                     if debug:
                         print '%s    start_time=%s end_time=%s' % (prefix,
                                 repr(when.start_time), repr(when.end_time))
 
                     allday = False
-                    start, allday = self.parse_time(when.start_time)
-                    end = self.parse_time(when.end_time)[0]
+                    start, allday = self.parse_time(when.start)
+                    end = self.parse_time(when.end)[0]
 
                     e = Event(event_id, title, start, end, allday,
                             calendar_title)
@@ -428,25 +430,6 @@ class CalendarServer(dbus.service.Object):
         return self.months[key].get_gnome_events()
 
 
-def login(email, password):
-    client = CalendarService()
-    client.email = email
-    client.password = password
-    client.source = 'github-gnome_shell_google_calendar-0.1'
-    client.ProgrammaticLogin()
-
-    return client
-
-
-def login_prompt():
-    print 'Please enter your Google Calendar login information.'
-    print 'The email and password will be stored securely in your keyring.'
-    email = raw_input('E-mail: ')
-    password = getpass('Password: ')
-
-    return email, password
-
-
 if __name__ == '__main__':
     dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
 
@@ -455,23 +438,18 @@ if __name__ == '__main__':
         if o == '--hide-cal':
             SHOW_SHORT_CALENDAR_TITLE = False
 
-    # Get credentials
-    try:
-        email, password = keyring.get_credentials()
-    except keyring.KeyringError:
-        email, password = login_prompt()
-        keyring.set_credentials(email, password)
+
+    account = config.get('account')
 
     # Login
     client = None
     while not client:
         try:
-            print "Logging in as '%s'..." % email
-            client = login(email, password)
+            print "Logging in as '%s'..." % account
+            client = oauth.oauth_login(account)
+            config.set('account', account)
         except Exception as e:
-            print '%s.' % e
-            email, password = login_prompt()
-            keyring.set_credentials(email, password)
+            account = oauth.oauth_prompt()
 
     myserver = CalendarServer(client)
     gtk.main()
