@@ -170,13 +170,13 @@ class Event(object):
 
     @write_traceback
     def as_gnome_event(self):
-        return ('', # uid
-                self.title if self.title else '', # summary
-                '', # description
-                self.allday, # allDay
-                self.start_time, # date
-                self.end_time, # end
-                {})                                 # extras
+        return ('',                                     # uid
+                self.title if self.title else '',       # summary
+                '',                                     # description
+                self.allday,                            # allDay
+                self.start_time,                        # date
+                self.end_time,                          # end
+                {})                                     # extras
 
     def __repr__(self):
         return '<Event: %r>' % (self.title)
@@ -437,7 +437,6 @@ if __name__ == '__main__':
     for o, a in opts:
         if o == '--hide-cal':
             SHOW_SHORT_CALENDAR_TITLE = False
-
 
     account = config.get('account')
 

@@ -6,14 +6,16 @@
 import unittest
 import datetime
 
+
 #  remove the copied module
 def cleanup():
-   import os
-   os.remove('gsgc_test.py')
-   if os.path.exists('gsgc_test.pyc'):
-      os.remove('gsgc_test.pyc')
+    import os
+    os.remove('gsgc_test.py')
+    if os.path.exists('gsgc_test.pyc'):
+        os.remove('gsgc_test.pyc')
 import atexit
 atexit.register(cleanup)
+
 
 #  import, but have to use a python-compatible name
 import shutil
@@ -23,24 +25,24 @@ import gsgc_test as gsgc
 
 #################################################
 class TestGnomeGoogleCalendar(unittest.TestCase):
-   def test_GetMonthKey(self):
-      from time import strftime, localtime
+    def test_GetMonthKey(self):
+        from time import strftime, localtime
 
-      def tostr(x):
-         return [ strftime('%Y%m%d %H%M%S', localtime(x)) for x in x ]
+        def tostr(x):
+            return [strftime('%Y%m%d %H%M%S', localtime(x)) for x in x]
 
-      self.assertEqual(tostr(
+        self.assertEqual(tostr(
             gsgc.get_month_key(datetime.datetime(2011, 12, 12))),
             ['20111127 000000', '20111231 235959'])
-      self.assertEqual(tostr(
+        self.assertEqual(tostr(
             gsgc.get_month_key(datetime.datetime(2011, 11, 1))),
             ['20111030 000000', '20111203 235959'])
-      self.assertEqual(tostr(
+        self.assertEqual(tostr(
             gsgc.get_month_key(datetime.datetime(2011, 1, 31))),
             ['20101226 000000', '20110205 235959'])
-      self.assertEqual(tostr(
+        self.assertEqual(tostr(
             gsgc.get_month_key(datetime.datetime(2012, 1, 31))),
             ['20120101 000000', '20120204 235959'])
 
 suite = unittest.TestLoader().loadTestsFromTestCase(TestGnomeGoogleCalendar)
-unittest.TextTestRunner(verbosity = 2).run(suite)
+unittest.TextTestRunner(verbosity=2).run(suite)
