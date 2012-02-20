@@ -5,12 +5,12 @@
 
 
     ~ What is it?
-      
+
       A D-Bus service that fetches events from Google Calendar and makes them
       available for GNOME Shell to display.
 
     ~ What do I need?
-      
+
       Python 2.6+ with the following modules:
         gtk
         dbus
@@ -18,15 +18,20 @@
         iso8601
         gnomekeyring
 
+      Packages:
+        gtk-engines
+        gtk-engine-murrine
+        gtk-engine-equinox
+
     ~ Usage
-      
+
       Run the daemon like so:
-      
+
         ./gnome-shell-google-calendar.py
-      
+
       You will be prompted for your Google Calendar email the
       first time. A password is not neccesary, as gnome-online-accounts is used.
-      
+
       Once logged in, events from all your calendars should appear in
       GNOME Shell's calendar.
 
@@ -35,9 +40,9 @@
       ".gnome-shell-google-calendar-excludes" in your home directory.
       List the title of each calendar you want to exclude on a separate
       line.
-    
+
     ~ Future
-      
+
       Add settings GUI
       Add setup script
 
