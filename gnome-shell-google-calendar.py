@@ -433,12 +433,16 @@ class CalendarServer(dbus.service.Object):
 if __name__ == '__main__':
     dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
 
-    opts, args = getopt.getopt(sys.argv[1:], '', ['hide-cal'])
+    opts, args = getopt.getopt(sys.argv[1:], '', ['hide-cal', 'account='])
+    account = None
     for o, a in opts:
         if o == '--hide-cal':
             SHOW_SHORT_CALENDAR_TITLE = False
+        if o == '--account':
+            account = a
 
-    account = config.get('account')
+    if not account:
+        account = config.get('account')
 
     # Login
     client = None
