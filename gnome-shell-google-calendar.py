@@ -450,9 +450,9 @@ if __name__ == '__main__':
         try:
             print "Logging in as '%s'..." % account
             client = oauth.oauth_login(account)
-            config.set('account', account)
         except Exception as e:
             account = oauth.oauth_prompt()
+            config.set('account', account)
 
     myserver = CalendarServer(client)
     gtk.main()
