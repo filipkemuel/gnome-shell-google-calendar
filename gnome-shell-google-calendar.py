@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 import sys
 import getopt
+import time as ptime
 from datetime import datetime, timedelta
 from getpass import getpass
 from threading import Thread
@@ -280,7 +281,8 @@ class CalendarServer(dbus.service.Object):
             allday = True
         except ValueError:
             time = iso8601.parse_date(timestr)
-            time = time.timetuple()[:-1] + (-1,)  # Discard tm_isdst
+            time = ptime.localtime(calendar.timegm(
+                time.utctimetuple()[:-1] + (-1,)))
             allday = False
 
         timestamp = int(mktime(time))
