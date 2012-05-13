@@ -259,7 +259,10 @@ class CalendarServer(dbus.service.Object):
         print feed.title.text + ':'
 
         for calendar in feed.entry:
-            title = calendar.title.text
+            if calendar.overridename:
+                title = calendar.overridename.value
+            else:
+                title = calendar.title.text
             url = calendar.content.src
 
             if title in excludes:
