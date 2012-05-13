@@ -241,17 +241,17 @@ class CalendarServer(dbus.service.Object):
     def get_excludes(self, filename):
         '''Gets a list of calendars to exclude'''
         with open(filename, 'r') as fp:
-            return [line.strip() for line in fp]
+            return frozenset(line.strip() for line in fp)
 
     def get_calendars(self):
         feed = self.client.GetAllCalendarsFeed()
 
         # Load excluded calendars from excludes file
-        excludes = []
+        excludes = set()
         for filename in ('excludes',
                 os.path.expanduser('~/.gnome-shell-google-calendar-excludes')):
             if os.path.exists(filename):
-                excludes += self.get_excludes(filename)
+                excludes |= self.get_excludes(filename)
 
         calendars = []
         urls = set()
@@ -259,7 +259,10 @@ class CalendarServer(dbus.service.Object):
         print feed.title.text + ':'
 
         for calendar in feed.entry:
-            title = calendar.title.text
+            if calendar.overridename:
+                title = calendar.overridename.value
+            else:
+                title = calendar.title.text
             url = calendar.content.src
 
             if title in excludes:
