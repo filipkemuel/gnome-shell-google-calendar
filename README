@@ -1,4 +1,3 @@
-
                           gnome-shell-google-calendar
 
                          Google Calendar in GNOME Shell
@@ -16,7 +15,6 @@
         dbus
         gdata
         iso8601
-        gnomekeyring
 
       Packages:
         gtk-engines
@@ -40,9 +38,4 @@
       ".gnome-shell-google-calendar-excludes" in your home directory.
       List the title of each calendar you want to exclude on a separate
       line.
-
-    ~ Future
-
-      Add settings GUI
-      Add setup script
 
