@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import codecs
 import sys
 import getopt
 import time as ptime
@@ -240,7 +241,7 @@ class CalendarServer(dbus.service.Object):
 
     def get_excludes(self, filename):
         '''Gets a list of calendars to exclude'''
-        with open(filename, 'r') as fp:
+        with codecs.open(filename, 'r', 'utf-8') as fp:
             return frozenset(line.strip() for line in fp)
 
     def get_calendars(self):
