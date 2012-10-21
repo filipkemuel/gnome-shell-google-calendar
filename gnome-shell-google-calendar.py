@@ -245,7 +245,15 @@ class CalendarServer(dbus.service.Object):
             return frozenset(line.strip() for line in fp)
 
     def get_calendars(self):
-        feed = self.client.GetAllCalendarsFeed()
+        while True:
+            try:
+                feed = self.client.GetAllCalendarsFeed()
+                break
+            except Exception, e:
+                print '*** Exception:', e
+                print 'Error retrieving all calendars.  Trying again in 5 seconds...'
+                sleep(5)
+                continue
 
         # Load excluded calendars from excludes file
         excludes = set()
