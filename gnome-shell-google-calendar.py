@@ -5,7 +5,6 @@ import sys
 import getopt
 import time as ptime
 from datetime import datetime, timedelta
-from getpass import getpass
 from threading import Thread
 from time import mktime, sleep
 
@@ -251,7 +250,8 @@ class CalendarServer(dbus.service.Object):
                 break
             except Exception, e:
                 print '*** Exception:', e
-                print 'Error retrieving all calendars.  Trying again in 5 seconds...'
+                print ('Error retrieving all calendars.'
+                        'Trying again in 5 seconds...')
                 sleep(5)
                 continue
 
