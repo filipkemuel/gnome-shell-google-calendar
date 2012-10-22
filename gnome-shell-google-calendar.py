@@ -250,7 +250,7 @@ class CalendarServer(dbus.service.Object):
                 break
             except Exception as e:
                 print '*** Exception:', e
-                print ('Error retrieving all calendars.'
+                print ('Error retrieving all calendars. '
                         'Trying again in 5 seconds...')
                 sleep(5)
                 continue
@@ -465,14 +465,19 @@ if __name__ == '__main__':
         try:
             client = oauth.oauth_login(account)
         except Exception as e:
-            print "Error logging in as '%s'" % account
-            print "'%s' may not be a GNOME online account.  A list of existing accounts is below." % account
-            print 'If you do not see a list of accounts, then you first need to add one.'
-            print 'For more information, see http://library.gnome.org/users/gnome-help/stable/accounts.html'
+            print 'Error logging in as \'%s\'' % account
+            print ('\'%s\' may not be a GNOME online account. '
+                    'A list of existing accounts is below.') % account
+            print ('If you do not see a list of accounts, '
+                    'then you first need to add one.')
+            print ('For more information, see '
+                    'http://library.gnome.org/users/gnome-help/stable/'
+                    'accounts.html')
             try:
                 account = oauth.oauth_prompt()
             except ValueError as e:
-                print 'You have entered an invalid account number.  Please enter an integer.'
+                print ('You have entered an invalid account number. '
+                        'Please enter an integer.')
             config.set('account', account)
 
     myserver = CalendarServer(client)
