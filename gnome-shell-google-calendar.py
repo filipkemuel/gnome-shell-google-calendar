@@ -461,11 +461,18 @@ if __name__ == '__main__':
     # Login
     client = None
     while not client:
+        print "Logging in as '%s'..." % account
         try:
-            print "Logging in as '%s'..." % account
             client = oauth.oauth_login(account)
         except Exception as e:
-            account = oauth.oauth_prompt()
+            print "Error logging in as '%s'" % account
+            print "'%s' may not be a GNOME online account.  A list of existing accounts is below." % account
+            print 'If you do not see a list of accounts, then you first need to add one.'
+            print 'For more information, see http://library.gnome.org/users/gnome-help/stable/accounts.html'
+            try:
+                account = oauth.oauth_prompt()
+            except ValueError, e:
+                print 'You have entered an invalid account number.  Please enter an integer.'
             config.set('account', account)
 
     myserver = CalendarServer(client)
