@@ -356,7 +356,7 @@ class CalendarServer(dbus.service.Object):
                     #print dir(when)
                     if debug:
                         print '%s    start_time=%s end_time=%s' % (prefix,
-                                repr(when.start_time), repr(when.end_time))
+                                repr(when.start), repr(when.end))
 
                     allday = False
                     start, allday = self.parse_time(when.start)
