@@ -42,7 +42,7 @@ def write_traceback(f):
             return ret
         except Exception as e:
             import traceback
-            print '*** Exception:', e
+            print '*** Exception:', str(e)
             traceback.print_exc()
             raise
     return wrapper
@@ -249,7 +249,7 @@ class CalendarServer(dbus.service.Object):
                 feed = self.client.GetAllCalendarsFeed()
                 break
             except Exception as e:
-                print '*** Exception:', e
+                print '*** Exception:', str(e)
                 print ('Error retrieving all calendars. '
                         'Trying again in 5 seconds...')
                 sleep(5)
@@ -464,7 +464,7 @@ if __name__ == '__main__':
         print "Logging in as '%s'..." % account
         try:
             client = oauth.oauth_login(account)
-        except Exception as e:
+        except Exception:
             print 'Error logging in as \'%s\'' % account
             print ('\'%s\' may not be a GNOME online account. '
                     'A list of existing accounts is below.') % account
@@ -475,7 +475,7 @@ if __name__ == '__main__':
                     'accounts.html')
             try:
                 account = oauth.oauth_prompt()
-            except ValueError as e:
+            except ValueError:
                 print ('You have entered an invalid account number. '
                         'Please enter an integer.')
             config.set('account', account)
