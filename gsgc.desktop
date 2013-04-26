@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=Gnome Shell Google Calendar
+Exec=gnome-shell-google-calendar
+Icon=system-run
+X-GNOME-Autostart-enabled=true
