@@ -258,7 +258,7 @@ class CalendarServer(dbus.service.Object):
         # Load excluded calendars from excludes file
         excludes = set()
         for filename in ('excludes',
-                os.path.expanduser('~/.gnome-shell-google-calendar-excludes')):
+                os.path.expanduser('~/.gnome-shell-google-calendar/excludes')):
             if os.path.exists(filename):
                 excludes |= self.get_excludes(filename)
 
