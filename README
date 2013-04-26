@@ -21,11 +21,18 @@
         gtk-engine-murrine
         gtk-engine-equinox
 
+    ~ Installation
+
+      Run the install-script:
+
+         ./install.sh
+
     ~ Usage
 
-      Run the daemon like so:
+      Run gcal-user-setup for a new user.
 
-        ./gnome-shell-google-calendar.py
+      The script will create the necessary settings files and make the script 
+      autorun on user login.
 
       You will be prompted for your Google Calendar email the
       first time. A password is not neccesary, as gnome-online-accounts is used.
@@ -33,9 +40,7 @@
       Once logged in, events from all your calendars should appear in
       GNOME Shell's calendar.
 
-      To exclude calendars, create a file named "excludes" in the directory
-      you run "gnome-shell-google-calendar" from, or a file named
-      ".gnome-shell-google-calendar-excludes" in your home directory.
+      To exclude calendars, create a file named "excludes" in
+      "~/.gnome-shell-google-calendar/" in your home directory.
       List the title of each calendar you want to exclude on a separate
       line.
-
