@@ -4,18 +4,20 @@ Created on 17.02.2012
 @author: flocki
 '''
 import json
+import os
 
 
 def set(parameter, value):
     config = get(None)
     config[parameter] = value
-    with open('config.json', 'w') as fp:
+
+    with open(os.path.expanduser('~/.gnome-shell-google-calendar/config.json'), 'w') as fp:
         json.dump(config, fp)
 
 
 def get(parameter):
     try:
-        with open('config.json', 'r') as fp:
+        with open(os.path.expanduser('~/.gnome-shell-google-calendar/config.json'), 'r') as fp:
             config = json.load(fp)
     except:
         config = dict()
