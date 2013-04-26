@@ -1,0 +1,3 @@
+#!/bin/sh
+cd /usr/share/gnome-shell-google-calendar
+python gnome-shell-google-calendar.py
