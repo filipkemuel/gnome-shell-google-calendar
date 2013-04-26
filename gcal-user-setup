@@ -1,0 +1,16 @@
+#!/bin/sh
+echo _________________________________________________
+echo      Gnome-Shell-Google-Calendar User Setup     
+echo -------------------------------------------------
+echo
+echo Remember to run "gcal-user-setup" before using it with a new user account. 
+echo
+echo a. Making settings dir
+mkdir ~/.gnome-shell-google-calendar
+echo b. copying excludes-example to settings dir
+cp /usr/share/gnome-shell-google-calendar/excludes-example ~/.gnome-shell-google-calendar/
+echo c. Installing Autorun script
+cp /usr/share/gnome-shell-google-calendar/gsgc.desktop ~/.config/autostart/
+chmod a+x ~/.config/autostart/gsgc.desktop
+echo c. Running gnome-shell-google-calendar for the first time.. 
+gnome-shell-google-calendar
