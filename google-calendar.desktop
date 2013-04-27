@@ -5,7 +5,6 @@ Name[de]=Google-Kalender
 Name[en_GB]=Google Calendar
 Exec=xdg-open "http://calendar.google.com"
 Icon=stock_calendar
-NoDisplay=true
 Type=Application
 StartupNotify=true
 Categories=GNOME;GTK;Office;Calendar;X-Red-Hat-Base;
